@@ -17,7 +17,9 @@
 package com.alibaba.dubbo.rpc.cluster.merger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.alibaba.dubbo.rpc.cluster.Merger;
 
@@ -26,14 +28,9 @@ import com.alibaba.dubbo.rpc.cluster.Merger;
  */
 public class ListMerger implements Merger<List<?>> {
 
-    public List<Object> merge(List<?>... items) {
-        List<Object> result = new ArrayList<Object>();
-        for (List<?> item : items) {
-            if (item != null) {
-                result.addAll(item);
-            }
-        }
-        return result;
-    }
+	public List<Object> merge(List<?>... items) {
+		return Arrays.stream(items).filter(item -> item != null).flatMap(item -> item.stream())
+				.collect(Collectors.toList());
+	}
 
 }

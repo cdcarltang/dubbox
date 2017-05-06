@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.utils.AtomicPositiveInteger;
@@ -56,12 +57,13 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
                 weightSequence = weightSequences.get(key);
             }
             int currentWeight = weightSequence.getAndIncrement() % maxWeight;
-            List<Invoker<T>> weightInvokers = new ArrayList<Invoker<T>>();
-            for (Invoker<T> invoker : invokers) { // 筛选权重大于当前权重基数的Invoker
-                if (getWeight(invoker, invocation) > currentWeight) {
-                    weightInvokers.add(invoker);
-                }
-            }
+            
+            // 筛选权重大于当前权重基数的Invoker
+            List<Invoker<T>> weightInvokers = invokers
+            		.stream()
+            		.filter(invoker-> getWeight(invoker, invocation) > currentWeight)
+            		.collect(Collectors.toList());
+            
             int weightLength = weightInvokers.size();
             if (weightLength == 1) {
                 return weightInvokers.get(0);

@@ -565,14 +565,6 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         return interfaceClass;
     }
 
-    /**
-     * @deprecated
-     * @see #setInterface(Class)
-     * @param interfaceClass
-     */
-    public void setInterfaceClass(Class<?> interfaceClass) {
-        setInterface(interfaceClass);
-    }
 
     public String getInterface() {
         return interfaceName;

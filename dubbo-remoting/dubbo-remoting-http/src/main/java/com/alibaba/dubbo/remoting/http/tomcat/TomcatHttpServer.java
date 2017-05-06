@@ -20,6 +20,7 @@ import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
+import com.alibaba.dubbo.common.utils.Try;
 import com.alibaba.dubbo.remoting.http.HttpHandler;
 import com.alibaba.dubbo.remoting.http.servlet.DispatcherServlet;
 import com.alibaba.dubbo.remoting.http.servlet.ServletManager;
@@ -79,13 +80,7 @@ public class TomcatHttpServer extends AbstractHttpServer {
 
     public void close() {
         super.close();
-
         ServletManager.getInstance().removeServletContext(url.getPort());
-
-        try {
-            tomcat.stop();
-        } catch (Exception e) {
-            logger.warn(e.getMessage(), e);
-        }
+        Try.withWarn(()-> tomcat.stop(), logger);
     }
 }

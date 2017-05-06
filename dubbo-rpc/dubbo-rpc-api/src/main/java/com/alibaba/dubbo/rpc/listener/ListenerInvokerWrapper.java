@@ -20,6 +20,7 @@ import java.util.List;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
+import com.alibaba.dubbo.common.utils.Try;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.InvokerListener;
 import com.alibaba.dubbo.rpc.RpcException;
@@ -46,15 +47,10 @@ public class ListenerInvokerWrapper<T> implements Invoker<T> {
         this.invoker = invoker;
         this.listeners = listeners;
         if (listeners != null && listeners.size() > 0) {
-            for (InvokerListener listener : listeners) {
-                if (listener != null) {
-                    try {
-                        listener.referred(invoker);
-                    } catch (Throwable t) {
-                        logger.error(t.getMessage(), t);
-                    }
-                }
-            }
+            listeners
+            .stream()
+            .filter(listener -> listener!=null)
+            .forEach(listener-> Try.withLog(()-> listener.referred(invoker), logger));
         }
     }
 
@@ -84,15 +80,7 @@ public class ListenerInvokerWrapper<T> implements Invoker<T> {
             invoker.destroy();
         } finally {
             if (listeners != null && listeners.size() > 0) {
-                for (InvokerListener listener : listeners) {
-                    if (listener != null) {
-                        try {
-                            listener.destroyed(invoker);
-                        } catch (Throwable t) {
-                            logger.error(t.getMessage(), t);
-                        }
-                    }
-                }
+                listeners.stream().filter(listener-> listener != null).forEach(l -> Try.withLog(()-> l.destroyed(invoker) , logger));
             }
         }
     }

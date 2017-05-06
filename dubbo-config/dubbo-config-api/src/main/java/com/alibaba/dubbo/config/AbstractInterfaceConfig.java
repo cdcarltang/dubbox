@@ -16,6 +16,7 @@
 package com.alibaba.dubbo.config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -257,13 +258,8 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                 if (methodName == null || methodName.length() == 0) {
                     throw new IllegalStateException("<dubbo:method> name attribute is required! Please check: <dubbo:service interface=\"" + interfaceClass.getName() + "\" ... ><dubbo:method name=\"\" ... /></<dubbo:reference>");
                 }
-                boolean hasMethod = false;
-                for (java.lang.reflect.Method method : interfaceClass.getMethods()) {
-                    if (method.getName().equals(methodName)) {
-                        hasMethod = true;
-                        break;
-                    }
-                }
+                boolean hasMethod = Arrays.stream(interfaceClass.getMethods()).anyMatch(method -> method.getName().equals(methodName) );
+                
                 if (!hasMethod) {
                     throw new IllegalStateException("The interface " + interfaceClass.getName()
                             + " not found method " + methodName);
@@ -317,37 +313,6 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         }
     }
 
-    /**
-     * @deprecated Replace to <code>getStub()</code>
-     * @return local
-     */
-    @Deprecated
-    public String getLocal() {
-        return local;
-    }
-
-    /**
-     * @deprecated Replace to <code>setStub(String)</code>
-     * @param local
-     */
-    @Deprecated
-    public void setLocal(String local) {
-        checkName("local", local);
-        this.local = local;
-    }
-
-    /**
-     * @deprecated Replace to <code>setStub(Boolean)</code>
-     * @param local
-     */
-    @Deprecated
-    public void setLocal(Boolean local) {
-        if (local == null) {
-            setLocal((String) null);
-        } else {
-            setLocal(String.valueOf(local));
-        }
-    }
     
     public String getStub() {
         return stub;

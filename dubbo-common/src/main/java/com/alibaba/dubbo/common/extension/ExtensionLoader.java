@@ -742,13 +742,8 @@ public class ExtensionLoader<T> {
     private String createAdaptiveExtensionClassCode() {
         StringBuilder codeBuidler = new StringBuilder();
         Method[] methods = type.getMethods();
-        boolean hasAdaptiveAnnotation = false;
-        for(Method m : methods) {
-            if(m.isAnnotationPresent(Adaptive.class)) {
-                hasAdaptiveAnnotation = true;
-                break;
-            }
-        }
+        boolean hasAdaptiveAnnotation = Arrays.stream(methods).anyMatch(m-> m.isAnnotationPresent(Adaptive.class));
+        
         // 完全没有Adaptive方法，则不需要生成Adaptive类
         if(! hasAdaptiveAnnotation)
             throw new IllegalStateException("No adaptive method on extension " + type.getName() + ", refuse to create the adaptive class!");

@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2011 Alibaba Group.
+    * Copyright 1999-2011 Alibaba Group.
  *  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.common.utils.NetUtils;
+import com.alibaba.dubbo.common.utils.Try;
 import com.alibaba.dubbo.remoting.http.HttpHandler;
 import com.alibaba.dubbo.remoting.http.servlet.DispatcherServlet;
 import com.alibaba.dubbo.remoting.http.support.AbstractHttpServer;
@@ -96,11 +97,7 @@ public class JettyHttpServer extends AbstractHttpServer {
         ServletManager.getInstance().removeServletContext(url.getPort());
 
         if (server != null) {
-            try {
-                server.stop();
-            } catch (Exception e) {
-                logger.warn(e.getMessage(), e);
-            }
+            Try.withWarn(() -> server.stop(), logger);
         }
     }
 

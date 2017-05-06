@@ -19,10 +19,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
@@ -40,6 +42,7 @@ import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.alibaba.dubbo.common.utils.ConcurrentHashSet;
 import com.alibaba.dubbo.common.utils.ReflectUtils;
+import com.alibaba.dubbo.common.utils.Try;
 import com.alibaba.dubbo.config.AbstractConfig;
 import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.ConsumerConfig;
@@ -53,6 +56,7 @@ import com.alibaba.dubbo.config.ServiceConfig;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 
+import static com.alibaba.dubbo.common.utils.Try.*;
 /**
  * AnnotationBean
  * 
@@ -115,20 +119,8 @@ public class AnnotationBean extends AbstractConfig implements DisposableBean, Be
     }
 
     public void destroy() throws Exception {
-        for (ServiceConfig<?> serviceConfig : serviceConfigs) {
-            try {
-                serviceConfig.unexport();
-            } catch (Throwable e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
-        for (ReferenceConfig<?> referenceConfig : referenceConfigs.values()) {
-            try {
-                referenceConfig.destroy();
-            } catch (Throwable e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
+        serviceConfigs.forEach(serviceConfig -> withLog(()->serviceConfig.unexport(), logger));
+        referenceConfigs.values().forEach(referenceConfig -> withLog(()->referenceConfig.destroy(), logger));
     }
 
     public Object postProcessAfterInitialization(Object bean, String beanName)
@@ -162,40 +154,22 @@ public class AnnotationBean extends AbstractConfig implements DisposableBean, Be
                     }
                     serviceConfig.setRegistries(registryConfigs);
                 }
-                if (service.provider() != null && service.provider().length() > 0) {
-                    serviceConfig.setProvider((ProviderConfig)applicationContext.getBean(service.provider(),ProviderConfig.class));
-                }
-                if (service.monitor() != null && service.monitor().length() > 0) {
-                    serviceConfig.setMonitor((MonitorConfig)applicationContext.getBean(service.monitor(), MonitorConfig.class));
-                }
-                if (service.application() != null && service.application().length() > 0) {
-                    serviceConfig.setApplication((ApplicationConfig)applicationContext.getBean(service.application(), ApplicationConfig.class));
-                }
-                if (service.module() != null && service.module().length() > 0) {
-                    serviceConfig.setModule((ModuleConfig)applicationContext.getBean(service.module(), ModuleConfig.class));
-                }
-                if (service.provider() != null && service.provider().length() > 0) {
-                    serviceConfig.setProvider((ProviderConfig)applicationContext.getBean(service.provider(), ProviderConfig.class));
-                } else {
-                    
-                }
+                ifNotEmpty(service.provider(), ()->  serviceConfig.setProvider((ProviderConfig)applicationContext.getBean(service.provider(),ProviderConfig.class)));
+                ifNotEmpty(service.monitor(), ()-> serviceConfig.setMonitor((MonitorConfig)applicationContext.getBean(service.monitor(), MonitorConfig.class)));
+                ifNotEmpty(service.application(), ()-> serviceConfig.setApplication((ApplicationConfig)applicationContext.getBean(service.application(), ApplicationConfig.class)));
+                ifNotEmpty(service.module(),() -> serviceConfig.setModule((ModuleConfig)applicationContext.getBean(service.module(), ModuleConfig.class)) );
+                ifNotEmpty(service.provider(), ()->  serviceConfig.setProvider((ProviderConfig)applicationContext.getBean(service.provider(), ProviderConfig.class)));
+               
                 if (service.protocol() != null && service.protocol().length > 0) {
-                    List<ProtocolConfig> protocolConfigs = new ArrayList<ProtocolConfig>();
-                    // modified by lishen; fix dubbo's bug
-                    for (String protocolId : service.protocol()) {
-                        if (protocolId != null && protocolId.length() > 0) {
-                            protocolConfigs.add((ProtocolConfig)applicationContext.getBean(protocolId, ProtocolConfig.class));
-                        }
-                    }
+                    List<ProtocolConfig> protocolConfigs =Arrays.stream(service.protocol())
+                    		.filter( protocolId -> protocolId != null && protocolId.length() > 0 )
+                    		.map( protocolId -> (ProtocolConfig)applicationContext.getBean(protocolId, ProtocolConfig.class) )
+                    		.collect(Collectors.toList());
+                                        
                     serviceConfig.setProtocols(protocolConfigs);
                 }
-                try {
-                    serviceConfig.afterPropertiesSet();
-                } catch (RuntimeException e) {
-                    throw (RuntimeException) e;
-                } catch (Exception e) {
-                    throw new IllegalStateException(e.getMessage(), e);
-                }
+              
+                Try.orElseThrow(()-> serviceConfig.afterPropertiesSet());
             }
             serviceConfig.setRef(bean);
             serviceConfigs.add(serviceConfig);

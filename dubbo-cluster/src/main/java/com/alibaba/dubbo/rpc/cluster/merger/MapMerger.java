@@ -35,6 +35,7 @@ public class MapMerger implements Merger<Map<?, ?>> {
                 result.putAll(item);
             }
         }
+        
         return result;
     }
 

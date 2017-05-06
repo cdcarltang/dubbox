@@ -16,6 +16,8 @@
 
 package com.alibaba.dubbo.rpc.cluster.merger;
 
+import java.util.Arrays;
+
 import com.alibaba.dubbo.rpc.cluster.Merger;
 
 /**
@@ -28,14 +30,16 @@ public class ByteArrayMerger implements Merger<byte[]>{
         for (byte[] array : items) {
             total += array.length;
         }
+        
         byte[] result = new byte[total];
         int index = 0;
         for (byte[] array : items) {
-            for (byte item : array) {
-                result[index++] = item;
-            }
+            System.arraycopy(array, 0, result, index, array.length);
+            index+=array.length;
         }
+
         return result;
     }
+
 
 }

@@ -31,9 +31,8 @@ public class DoubleArrayMerger implements Merger<double[]> {
         double[] result = new double[total];
         int index = 0;
         for (double[] array : items) {
-            for (double item : array) {
-                result[index++] = item;
-            }
+        	  System.arraycopy(array, 0, result, index, array.length);
+              index+=array.length;
         }
         return result;
     }

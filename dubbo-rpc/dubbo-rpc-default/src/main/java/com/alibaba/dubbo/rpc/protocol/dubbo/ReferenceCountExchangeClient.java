@@ -97,9 +97,6 @@ final class ReferenceCountExchangeClient implements ExchangeClient {
         return client.hasAttribute(key);
     }
 
-    public void reset(Parameters parameters) {
-        client.reset(parameters);
-    }
 
     public void send(Object message) throws RemotingException {
         client.send(message);

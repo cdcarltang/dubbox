@@ -31,9 +31,8 @@ public class CharArrayMerger implements Merger<char[]> {
         char[] result = new char[total];
         int index = 0;
         for (char[] array : items) {
-            for (char item : array) {
-                result[index++] = item;
-            }
+        	 System.arraycopy(array, 0, result, index, array.length);
+             index+=array.length;
         }
         return result;
     }

@@ -15,12 +15,13 @@
  */
 package com.alibaba.dubbo.remoting.transport.netty;
 
-import org.jboss.netty.logging.AbstractInternalLogger;
-import org.jboss.netty.logging.InternalLogger;
-import org.jboss.netty.logging.InternalLoggerFactory;
 
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
+
+import io.netty.util.internal.logging.AbstractInternalLogger;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 /**
  * @author <a href="mailto:gang.lvg@taobao.com">kimi</a>
@@ -38,7 +39,7 @@ final class NettyHelper {
 
         @Override
         public InternalLogger newInstance(String name) {
-            return new DubboLogger(LoggerFactory.getLogger(name));
+            return new DubboLogger(name);
         }
     }
 
@@ -46,8 +47,9 @@ final class NettyHelper {
 
         private Logger logger;
 
-        DubboLogger(Logger logger) {
-            this.logger = logger;
+        DubboLogger(String name) {
+        	super(name);
+            this.logger = LoggerFactory.getLogger(name);
         }
 
         public boolean isDebugEnabled() {
@@ -102,6 +104,114 @@ final class NettyHelper {
         public String toString() {
             return logger.toString();
         }
+
+		@Override
+		public boolean isTraceEnabled() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public void trace(String msg) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void trace(String format, Object arg) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void trace(String format, Object argA, Object argB) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void trace(String format, Object... arguments) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void trace(String msg, Throwable t) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void debug(String format, Object arg) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void debug(String format, Object argA, Object argB) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void debug(String format, Object... arguments) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void info(String format, Object arg) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void info(String format, Object argA, Object argB) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void info(String format, Object... arguments) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void warn(String format, Object arg) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void warn(String format, Object... arguments) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void warn(String format, Object argA, Object argB) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void error(String format, Object arg) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void error(String format, Object argA, Object argB) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void error(String format, Object... arguments) {
+			// TODO Auto-generated method stub
+			
+		}
     }
 
 }

@@ -275,7 +275,8 @@ public class ThriftCodec implements Codec2 {
             TApplicationException exception;
 
             try {
-                exception = TApplicationException.read( protocol );
+            	exception = new TApplicationException();
+            	exception.read( protocol );
                 protocol.readMessageEnd();
             } catch ( TException e ) {
                 throw new IOException( e.getMessage(), e );

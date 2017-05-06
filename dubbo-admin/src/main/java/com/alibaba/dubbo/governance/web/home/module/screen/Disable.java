@@ -47,11 +47,11 @@ public class Disable extends Shell {
 					throw new IllegalStateException("The user " + currentUser.getUsername() + " have no privilege of service " + provider.getService());
 				}
 			}
-			for (Provider provider : providers) {
+			providers.forEach( provider -> {
 				provider.setUsername(operator);
 				provider.setOperatorAddress(operatorAddress);
 				providerService.disableProvider(provider.getId());
-			}
+			});
 		}
 		return "Disable " + (providers == null ? 0 : providers.size()) + " services.";
     }

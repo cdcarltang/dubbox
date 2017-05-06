@@ -28,6 +28,7 @@ public class BooleanArrayMerger implements Merger<boolean[]> {
         for(boolean[] array : items) {
             totalLen += array.length;
         }
+        
         boolean[] result = new boolean[totalLen];
         int index = 0;
         for(boolean[] array : items) {
@@ -35,6 +36,7 @@ public class BooleanArrayMerger implements Merger<boolean[]> {
                 result[index++] = item;
             }
         }
+        
         return result;
     }
 

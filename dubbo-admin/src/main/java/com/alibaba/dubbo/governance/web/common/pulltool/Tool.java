@@ -44,6 +44,7 @@ import com.alibaba.dubbo.registry.common.route.ParseUtils;
 import com.alibaba.dubbo.registry.common.route.RouteRule;
 import com.alibaba.dubbo.registry.common.route.RouteRule.MatchPair;
 import com.alibaba.dubbo.registry.common.util.StringEscapeUtils;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 /**
  * Tool
@@ -94,7 +95,7 @@ public class Tool {
     }
     
     public static String getHostAddress(String address) {
-        if (address != null && address.length() > 0) {
+        if (isNotBlank(address)) {
             int i = address.indexOf(':');
             String port = address.substring(i+1);
             String hostname = NetUtils.getHostName(address);

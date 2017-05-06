@@ -16,6 +16,7 @@
 package com.alibaba.dubbo.rpc.protocol;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,6 +85,7 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
                 attachment.put(key, value);
             }
         }
+
         return attachment;
     }
 

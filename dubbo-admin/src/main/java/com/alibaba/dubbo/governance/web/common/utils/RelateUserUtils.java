@@ -34,12 +34,11 @@ public class RelateUserUtils {
     public static void addOwnersOfService(Set<String> usernames, String serviceName,
                                           OwnerService ownerDAO) {
         List<String> serviceNamePatterns = ownerDAO.findAllServiceNames();
-        for (String p : serviceNamePatterns) {
-            if (ParseUtils.isMatchGlobPattern(p, serviceName)) {
-                List<String> list = ownerDAO.findUsernamesByServiceName(p);
-                usernames.addAll(list);
-            }
-        }
+       
+        serviceNamePatterns
+        .stream()
+        .filter(p -> ParseUtils.isMatchGlobPattern(p, serviceName))
+        .forEach(p-> usernames.addAll(ownerDAO.findUsernamesByServiceName(p)));
     }
 
     /**
@@ -51,11 +50,10 @@ public class RelateUserUtils {
     public static void addOwnersOfServicePattern(Set<String> usernames, String serviceNamePattern,
                                                 OwnerService ownerDAO) {
         List<String> serviceNamePatterns = ownerDAO.findAllServiceNames();
-        for (String p : serviceNamePatterns) {
-            if (ParseUtils.hasIntersection(p, serviceNamePattern)) {
-                List<String> list = ownerDAO.findUsernamesByServiceName(p);
-                usernames.addAll(list);
-            }
-        }
+ 
+        serviceNamePatterns
+        .stream()
+        .filter(p -> ParseUtils.hasIntersection(p, serviceNamePattern))
+        .forEach(p -> usernames.addAll(ownerDAO.findUsernamesByServiceName(p)));
     }
 }

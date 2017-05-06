@@ -16,6 +16,7 @@
 package com.alibaba.dubbo.rpc.protocol;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,7 +44,6 @@ public abstract class AbstractProtocol implements Protocol {
 
 	protected final Map<String, Exporter<?>> exporterMap = new ConcurrentHashMap<String, Exporter<?>>();
 
-	//TODO SOFEREFENCE
     protected final Set<Invoker<?>> invokers = new ConcurrentHashSet<Invoker<?>>();
     
 	protected static String serviceKey(URL url) {
@@ -68,6 +68,7 @@ public abstract class AbstractProtocol implements Protocol {
                 }
             }
 	    }
+	    
 	    for (String key : new ArrayList<String>(exporterMap.keySet())) {
             Exporter<?> exporter = exporterMap.remove(key);
             if (exporter != null) {
@@ -103,4 +104,6 @@ public abstract class AbstractProtocol implements Protocol {
         
         return timeout;
     }
+	
+
 }

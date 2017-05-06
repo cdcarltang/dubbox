@@ -72,9 +72,8 @@ public class StaticDirectory<T> extends AbstractDirectory<T> {
             return;
         }
         super.destroy();
-        for (Invoker<T> invoker : invokers) {
-            invoker.destroy();
-        }
+
+        invokers.forEach(i -> i.destroy());
         invokers.clear();
     }
     

@@ -16,8 +16,9 @@
 
 package com.alibaba.dubbo.rpc.cluster.merger;
 
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.alibaba.dubbo.rpc.cluster.Merger;
 
@@ -26,16 +27,9 @@ import com.alibaba.dubbo.rpc.cluster.Merger;
  */
 public class SetMerger implements Merger<Set<?>> {
 
-    public Set<Object> merge(Set<?>... items) {
+	public Set<Object> merge(Set<?>... items) {
 
-        Set<Object> result = new HashSet<Object>();
-
-        for (Set<?> item : items) {
-            if (item != null) {
-                result.addAll(item);
-            }
-        }
-
-        return result;
-    }
+		return Arrays.stream(items).filter(item -> item != null).flatMap(item -> item.stream())
+				.collect(Collectors.toSet());
+	}
 }

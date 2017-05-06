@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -94,12 +95,14 @@ public class Dump extends Restful {
     public void consumers(Map<String, Object> context) throws IOException {
         PrintWriter writer = response.getWriter();
         List<Consumer> consumers = consumerDAO.findAll();
-        List<String> sortedConsumerss = new ArrayList<String>();
-        for (Consumer consumer : consumers) {
-            sortedConsumerss.add(consumer.getAddress() + " " + consumer.getService());
-        }
-        Collections.sort(sortedConsumerss);
+        List<String> sortedConsumerss = consumers
+        		.stream()
+        		.map(consumer -> consumer.getAddress() + " " + consumer.getService() )
+        		.sorted()
+        		.collect(Collectors.toList());
+      
         writer.println(sortedConsumerss.size() + " consumer instance");
+        
         for (String consumer : sortedConsumerss) {
             writer.println(consumer);
         }
@@ -119,19 +122,23 @@ public class Dump extends Restful {
         for (Consumer consumer : consumers) {
             parametersSet.add(consumer.getParameters());
         }
-        Iterator<String> temp = parametersSet.iterator();
-        while (temp.hasNext()) {
-            Map<String, String> parameter = StringUtils.parseQueryString(temp.next());
-            if (parameter != null) {
-                String dubboversion = parameter.get("dubbo");
-                String app = parameter.get("application");
-                if (versions.get(dubboversion) == null) {
-                    Set<String> apps = new HashSet<String>();
-                    versions.put(dubboversion, apps);
-                }
-                versions.get(dubboversion).add(app);
-            }
-        }
+       
+        
+        parametersSet
+        .stream()
+        .map(p ->  StringUtils.parseQueryString(p) )
+        .filter(p -> p != null)
+        .forEach(parameter ->{
+        	 String dubboversion = parameter.get("dubbo");
+             String app = parameter.get("application");
+             if (versions.get(dubboversion) == null) {
+                 Set<String> apps = new HashSet<String>();
+                 versions.put(dubboversion, apps);
+             }
+             versions.get(dubboversion).add(app);
+        });
+        
+        
         for (String version : versions.keySet()) {
             writer.println("dubbo version: " + version);
             writer.println(StringUtils.join(versions.get(version), "\n"));
